@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Pajak Kendaraan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <div class="language-switcher-container">
+            <div class="toggle-switch language-toggle">
+                <input type="radio" id="lang-id" name="language" value="id" checked>
+                <label for="lang-id">ID</label>
+                <input type="radio" id="lang-en" name="language" value="en">
+                <label for="lang-en">EN</label>
+                <span class="slider-thumb"></span>
+            </div>
+        </div>
+
+        <h1 id="mainTitle">Kalkulator Pajak Kendaraan</h1>
+
+        <div class="mode-switcher-container">
+            <div class="toggle-switch mode-toggle">
+                <input type="radio" id="mode-new" name="calculatorMode" value="newRegistration" checked>
+                <label for="mode-new" id="modeNewRegOpt">Registrasi Baru</label>
+                <input type="radio" id="mode-transfer" name="calculatorMode" value="plateTransfer">
+                <label for="mode-transfer" id="modePlateTransferOpt">Transfer Plat Nomor</label>
+                <span class="slider-thumb"></span>
+            </div>
+        </div>
+
+        <div id="instructions" class="instructions-box">
+            <h4 id="instructionsTitle">Cara Menggunakan (Registrasi Baru):</h4>
+            <ol>
+                <li id="step1">Masukkan plat nomor yang ingin Anda daftarkan.</li>
+                <li id="step2">Cek Banned Vehicle List dan Vehicle Registration Guide untuk informasi role exempt dan/atau pajak tambahan kendaraan yang ingin Anda daftarkan.</li>
+                <li id="step3">Masukkan role exempt dan pilih golongan kendaraan sesuai daftar tersebut. Jika nama kendaraan Anda tidak tercantum, pilih 'Tidak Ada'.</li>
+            </ol>
+            <ol id="transferInstructions" style="display:none;">
+                <li id="transferStep1">Tentukan apakah kendaraan tujuan transfer Anda sudah terdaftar sebelumnya atau belum.</li>
+                <li id="transferStep2">Jika belum, lihat Banned Vehicles List dan Registration Guide untuk biaya tambahan yang diperlukan untuk mendaftar kendaraan tersebut.</li>
+                <li id="transferStep3">Jika sudah, Anda hanya akan dikenakan pajak transfer dasar.</li>
+                <li id="transferStep4">Kendaraan dapat didaftarkan dengan lebih dari satu plat nomor, namun perlu dicatat bahwa tiap plat nomor dihitung satu slot registrasi.</li>
+            </ol>
+            <p id="orgInfo" class="org-info-text" style="text-align:center">[KORLANTAS IRP - 2025]</p>
+        </div>
+
+        <div id="newRegistrationModeSection">
+            <div class="form-group">
+                <h4 id="plateLabel">Plat Nomor Kendaraan</h4>
+                <div class="plate-input-labels">
+                    <span id="plateLabelPart1">Kode Wilayah</span>
+                    <span id="plateLabelPart2">Nomor Unik</span>
+                    <span id="plateLabelPart3">Huruf Unik</span>
+                </div>
+                <div class="plate-inputs">
+                    <input type="text" id="platePart1" placeholder="B" maxlength="2">
+                    <input type="text" id="platePart2" placeholder="1234" maxlength="4">
+                    <input type="text" id="platePart3" placeholder="XYZ" maxlength="3">
+                </div>
+                <div class="plate-visual-container">
+                    <div class="plate-visual">
+                        <div class="plate-main">
+                            <span id="visPart1">&nbsp;</span>
+                            <span id="visPart2">&nbsp;</span>
+                            <span id="visPart3">&nbsp;</span>
+                        </div>
+                        <div class="plate-date" id="visDate">XX . XX</div>
+                    </div>
+                </div>
+                <div class="plate-info-area">
+                    <div id="plateCodeError"></div>
+                    <div id="platePart3Error"></div>
+                    <div id="derivedFormat"></div>
+                    <div id="plateError"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="plateTransferModeSection" style="display: none;">
+            <div class="form-group">
+                <div id="transferBaseTaxDisplay" class="transfer-base-tax-display"></div>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="isVehicleAlreadyRegistered">
+                <label for="isVehicleAlreadyRegistered" id="alreadyRegisteredLabel">Kendaraan tujuan transfer sudah terdaftar dengan plat nomor Lain</label>
+            </div>
+        </div>
+        
+        <div id="sharedVehicleOptionsSection">
+            <div class="form-group">
+                <h4 id="roleLabel">Role Exempt Kendaraan</h4>
+                <select id="roleExempt">
+                    <option value="Tidak" id="roleOptTidak">Tidak Ada</option>
+                    <option value="RIVE" id="roleOptRIVE">RIVE</option>
+                    <option value="BVET1" id="roleOptBVET1">BVE Tier 1</option>
+                    <option value="BVET2" id="roleOptBVET2">BVE Tier 2</option>
+                    <option value="BVET3" id="roleOptBVET3">BVE Tier 3</option>
+                    <option value="TVE" id="roleOptTVE">TVE</option>
+                </select>
+            </div>
+
+            <h4 class="group-title" id="vehicleCategoryLabel">Golongan Kendaraan</h4>
+            
+            <div class="vehicle-options-grid">
+                
+                <div class="option-card" id="electrifiedCheckboxGroup">
+                    <input type="checkbox" id="isElectrified" disabled>
+                    <label for="isElectrified">
+                        <span id="electrifiedLabel">Elektrifikasi / Pajak Rendah</span>
+                        <span class="btn-note" id="electrifiedNote">Plat standar saja</span>
+                    </label>
+                </div>
+
+                <div class="option-card" id="domesticCheckboxGroup">
+                    <input type="checkbox" id="isDomestic" disabled>
+                    <label for="isDomestic">
+                        <span id="domesticLabel">Domestik / Lokal</span>
+                        <span class="btn-note" id="domesticNote">Plat standar saja</span>
+                    </label>
+                </div>
+                
+                <div class="option-card">
+                    <input type="checkbox" id="isLuxuryCar">
+                    <label for="isLuxuryCar" id="luxuryCarLabel">Luxury Car</label>
+                </div>
+
+                <div class="option-card">
+                    <input type="checkbox" id="isSportscar">
+                    <label for="isSportscar" id="sportscarLabel">Sportscar</label>
+                </div>
+
+            </div>
+        </div>
+
+        <button id="calculateButton" disabled>Hitung Pajak</button>
+
+        <div id="result" class="result-section" style="display: none;">
+            <div id="resultTitleLabel">Total Pajak:</div>
+            
+            <div id="resultValue">Rp 0,-</div>
+
+            <div id="copyInstruction">Klik nominal di atas untuk menyalin</div>
+
+            <div id="result" class="result-section" style="display: none;">
+                <div id="resultTitleLabel">Total Pajak:</div>
+                
+                <div id="resultValue">Rp 0,-</div>
+                <div id="copyInstruction">Klik nominal di atas untuk menyalin</div>
+    
+                <div id="resultPlateContainer" style="display: none;">
+                    <div class="plate-visual" id="resultPlateVisual">
+                        <div class="plate-main">
+                            <span id="resVisPart1"></span>
+                            <span id="resVisPart2"></span>
+                            <span id="resVisPart3"></span>
+                        </div>
+                        <div class="plate-date" id="resVisDate">10 . 29</div>
+                    </div>
+                    <div id="plateCopyInstruction">Klik plat nomor untuk menyalin teks</div>
+                </div>
+                <p id="detailsTitle">Rincian Perhitungan:</p>
+                <ul></ul>
+            </div>
+
+            <p id="detailsTitle">Rincian Perhitungan:</p>
+            <ul id="resultDetailsList"></ul>
+            
+            <div id="availabilityNote" class="result-note"></div>
+            <div id="renewalNote" class="result-note renewal-alert" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
